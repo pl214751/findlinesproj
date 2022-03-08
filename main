@@ -1,13 +1,14 @@
 import cv2
 import numpy as np
+import math
 
 img = cv2.imread("/Users/local/Desktop/unnamed.jpg")
 
 
-pt_D = [552, 168]
-pt_C = [2424, 192]
-pt_B = [2991, 2155]
-pt_A = [39, 2158]
+pt_D = [562, 184]
+pt_C = [2408, 200]
+pt_B = [2980, 2152]
+pt_A = [49, 2147]
 
 width_AD = np.sqrt(((pt_A[0] - pt_D[0]) ** 2) + ((pt_A[1] - pt_D[1]) ** 2))
 width_BC = np.sqrt(((pt_B[0] - pt_C[0]) ** 2) + ((pt_B[1] - pt_C[1]) ** 2))
@@ -25,6 +26,25 @@ output_pts = np.array([
      [0, maxHeight - 1]], dtype = "float32")
 M = cv2.getPerspectiveTransform(input_pts,output_pts)
 out = cv2.warpPerspective(img,M,(maxWidth, maxHeight))
+gray = cv2.cvtColor(out, cv2.COLOR_BGR2GRAY)
 
+dst = cv2.Canny(gray, 50, 200, None, 3)
+lines = cv2.HoughLines(dst, 1, np.pi / 180, 100, None, 0, 0)
+if lines is not None:
+        for i in range(0, len(lines)):
+            rho = lines[i][0][0]
+            theta = lines[i][0][1]
+            a = math.cos(theta)
+            b = math.sin(theta)
+            x0 = a * rho
+            y0 = b * rho
+            pt1 = (int(x0 + 1000*(-b)), int(y0 + 1000*(a)))
+            pt2 = (int(x0 - 1000*(-b)), int(y0 - 1000*(a)))
+            cv2.line(gray, pt1, pt2, (0,0,255), 3, cv2.LINE_AA)
+linesP = cv2.HoughLinesP(dst, 1, np.pi / 180, 50, None, 2800, 900)
+if linesP is not None:
+    for i in range(0, len(linesP)):
+        l = linesP[i][0]
+        cv2.line(out, (l[0], l[1]), (l[2], l[3]), (0,0,255), 20, cv2.LINE_AA)
 cv2.imshow("bob",out)
 cv2.waitKey(0)
