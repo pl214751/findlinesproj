@@ -2,8 +2,10 @@ import cv2
 import numpy as np
 import math
 
-img = cv2.imread("/Users/local/Desktop/unnamed-1.jpg")
 
+img = cv2.imread("/Users/local/Desktop/unnamed-1.jpg")
+img2 = cv2.imread("/Users/local/Desktop/unnamed.jpg")
+img3 = cv2.imread("/Users/local/Desktop/unnamed-2.jpg")
 
 pt_D = [562, 184]
 pt_C = [2408, 200]
@@ -20,45 +22,128 @@ maxHeight = max(int(height_AB), int(height_CD))
 
 input_pts = np.float32([pt_D, pt_C, pt_B, pt_A])
 output_pts = np.array([
-     [0, 0],
-     [maxWidth - 1, 0],
-     [maxWidth - 1, maxHeight - 1],
-     [0, maxHeight - 1]], dtype = "float32")
+ [0, 0],
+ [maxWidth - 1, 0],
+ [maxWidth - 1, maxHeight - 1],
+ [0, maxHeight - 1]], dtype = "float32")
 M = cv2.getPerspectiveTransform(input_pts,output_pts)
 out = cv2.warpPerspective(img,M,(maxWidth, maxHeight))
 gray = cv2.cvtColor(out, cv2.COLOR_BGR2GRAY)
-
 dst = cv2.Canny(gray, 50, 200, None, 3)
-lines = cv2.HoughLines(dst, 1, np.pi / 180, 100, None, 0, 0)
-if lines is not None:
-        for i in range(0, len(lines)):
-            rho = lines[i][0][0]
-            theta = lines[i][0][1]
-            a = math.cos(theta)
-            b = math.sin(theta)
-            x0 = a * rho
-            y0 = b * rho
-            pt1 = (int(x0 + 1000*(-b)), int(y0 + 1000*(a)))
-            pt2 = (int(x0 - 1000*(-b)), int(y0 - 1000*(a)))
-            cv2.line(gray, pt1, pt2, (0,0,255), 3, cv2.LINE_AA)
-linesP = cv2.HoughLinesP(dst, 1, np.pi / 180, 50, None, 2900, 900)
-if linesP is not None:
-    mylistx = []
-    mylisty = []
-    for i in range(0, len(linesP)):
-        l = linesP[i][0]
-        cv2.line(out, (l[0], l[1]), (l[2], l[3]), (0, 0, 255), 2, cv2.LINE_AA)
-        mylistx.append(l[0])
-        mylisty.append(l[1])
-        mylistx.append(l[2])
-        mylisty.append(l[3])
-point1 = mylistx[-1]
-point2 = mylistx[0]
-xpointdiff = int(point2) + int(point1)
-centerxpoint = int(xpointdiff)/2
 
-out = cv2.arrowedLine(out,(int(centerxpoint), 1500), (int(centerxpoint), 500), (0, 0, 255), 10)
-print(mylistx)
-print(mylisty)
-cv2.imshow("bob",out)
+pt_D2 = [1751, 238]
+pt_B2 = [2892, 1159]
+pt_C2 = [1244, 2499]
+pt_A2 = [106, 1236]
+
+width_AD2 = np.sqrt(((pt_C2[0] - pt_A2[0]) ** 2) + ((pt_C2[1] - pt_A2[1]) ** 2))
+width_CB = np.sqrt(((pt_B2[0] - pt_D2[0]) ** 2) + ((pt_B2[1] - pt_D2[1]) ** 2))
+maxWidth2 = max(int(width_CB), int(width_AD2))
+
+height_AC = np.sqrt(((pt_B2[0] - pt_C2[0]) ** 2) + ((pt_B2[1] - pt_C2[1]) ** 2))
+height_BD = np.sqrt(((pt_D2[0] - pt_A2[0]) ** 2) + ((pt_D2[1] - pt_A2[1]) ** 2))
+maxHeight2 = max(int(height_BD), int(height_AC))
+
+input_pts2 = np.float32([pt_D2, pt_B2, pt_C2, pt_A2])
+
+output_pts2 = np.array([
+[0, 0],
+[maxWidth2 - 1, 0],
+[maxWidth2 - 1, maxHeight2 - 1],
+[0, maxHeight2 - 1]], dtype="float32")
+
+Z = cv2.getPerspectiveTransform(input_pts2,output_pts2)
+out2 = cv2.warpPerspective(img2,Z,(maxWidth2, maxHeight2))
+gray2 = cv2.cvtColor(out2, cv2.COLOR_BGR2GRAY)
+dst2 = cv2.Canny(gray2, 50, 200, None, 3)
+
+pt_D3 = [108, 965]
+pt_B3 = [1414, 191]
+pt_C3 = [2889, 1507]
+pt_A3 = [1561, 2624]
+
+width_AD3 = np.sqrt(((pt_C3[0] - pt_A3[0]) ** 2) + ((pt_C3[1] - pt_A3[1]) ** 2))
+width_CB3 = np.sqrt(((pt_B3[0] - pt_D3[0]) ** 2) + ((pt_B3[1] - pt_D3[1]) ** 2))
+maxWidth3 = max(int(width_CB3), int(width_AD3))
+
+height_AC3 = np.sqrt(((pt_B3[0] - pt_C3[0]) ** 2) + ((pt_B3[1] - pt_C3[1]) ** 2))
+height_BD3 = np.sqrt(((pt_D3[0] - pt_A3[0]) ** 2) + ((pt_D3[1] - pt_A3[1]) ** 2))
+maxHeight3 = max(int(height_BD3), int(height_AC3))
+
+input_pts3 = np.float32([pt_D3, pt_B3, pt_C3, pt_A3])
+
+output_pts3 = np.array([
+[0, 0],
+[maxWidth3 - 1, 0],
+[maxWidth3 - 1, maxHeight3 - 1],
+[0, maxHeight3 - 1]], dtype="float32")
+
+X = cv2.getPerspectiveTransform(input_pts3,output_pts3)
+out3 = cv2.warpPerspective(img3,X,(maxWidth3, maxHeight3))
+gray3 = cv2.cvtColor(out3, cv2.COLOR_BGR2GRAY)
+dst3 = cv2.Canny(gray3, 50, 200, None, 3)
+
+def line_detection(exdst, exout, exgray):
+ lines = cv2.HoughLines(exdst, 1, np.pi / 180, 100, None, 0, 0)
+ if lines is not None:
+     for i in range(0, len(lines)):
+         rho = lines[i][0][0]
+         theta = lines[i][0][1]
+         a = math.cos(theta)
+         b = math.sin(theta)
+         x0 = a * rho
+         y0 = b * rho
+         pt1 = (int(x0 + 1000*(-b)), int(y0 + 1000*(a)))
+         pt2 = (int(x0 - 1000*(-b)), int(y0 - 1000*(a)))
+         cv2.line(exgray, pt1, pt2, (0,0,255), 3, cv2.LINE_AA)
+ linesP = cv2.HoughLinesP(exdst, 1, np.pi / 180, 50, None, 2900, 900)
+ if linesP is not None:
+     mylistx = []
+     mylisty = []
+     for i in range(0, len(linesP)):
+         l = linesP[i][0]
+         cv2.line(exout, (l[0], l[1]), (l[2], l[3]), (0, 0, 255), 2, cv2.LINE_AA)
+         mylistx.append(l[0])
+         mylisty.append(l[1])
+         mylistx.append(l[2])
+         mylisty.append(l[3])
+     point1 = mylistx[-1]
+     point2 = mylistx[0]
+     xpointsum = int(point2) + int(point1)
+     centerxpoint = int(xpointsum)/2
+     exout = cv2.arrowedLine(exout, (int(centerxpoint), 1500), (int(centerxpoint), 500), (0, 0, 255), 10)
+ if linesP is None:
+     linesZ = cv2.HoughLinesP(exdst, 1, np.pi / 180, 50, None, 1000, 900)
+     mylistx = []
+     mylisty = []
+     for i in range(0, len(linesZ)):
+         l = linesZ[i][0]
+         cv2.line(exout, (l[0], l[1]), (l[2], l[3]), (0, 0, 255), 2, cv2.LINE_AA)
+         mylistx.append(l[0])
+         mylisty.append(l[1])
+         mylistx.append(l[2])
+         mylisty.append(l[3])
+     point1 = mylistx[-1]
+     point2 = mylistx[0]
+     xpointsum = int(point2) + int(point1)
+     centerxpoint = int(xpointsum) / 2
+     exout = cv2.arrowedLine(exout, (int(centerxpoint), 1500), (int(centerxpoint), 500), (0, 0, 255), 10)
+
+
+line_detection(dst, out, gray)
+C = cv2.getPerspectiveTransform(output_pts,input_pts)
+done = cv2.warpPerspective(out, C, (3020, 4028))
+cv2.imshow("1",done)
+cv2.waitKey(0)
+
+line_detection(dst2, out2, gray2)
+C2 = cv2.getPerspectiveTransform(output_pts2,input_pts2)
+done2 = cv2.warpPerspective(out, C2, (3020, 4028))
+cv2.imshow("2", done2)
+cv2.waitKey(0)
+
+line_detection(dst3, out3, gray3)
+C3 = cv2.getPerspectiveTransform(output_pts3,input_pts3)
+done3 = cv2.warpPerspective(out, C3, (3020, 4028))
+cv2.imshow("3", done3)
 cv2.waitKey(0)
